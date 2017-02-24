@@ -12,6 +12,16 @@ MovieController.list = (request, response, next) => {
     });
 };
 
+MovieController.show = (request, response, next) => {
+  MovieModel.findById(request.params._id).exec()
+    .then(movies => {
+      return response.json(movies);
+    })
+    .catch(error => {
+      next('Error showing movie: ' + error);
+    });
+};
+
 MovieController.add = (request, response, next) => {
   const newMovie = new MovieModel({
     title: request.body.title,
@@ -25,6 +35,23 @@ MovieController.add = (request, response, next) => {
     })
     .catch(error => {
       next('Error adding movie: ' + error);
+    });
+};
+
+MovieController.update = (request, response, next) => {
+  MovieModel.findById(request.params._id).exec()
+    .then(movie => {
+      movie.title = request.body.title || movie.title;
+      movie.posterPath = request.body.posterPath || movie.posterPath;
+      movie.overview = request.body.overview || movie.overview;
+
+      return movie.save();
+    })
+    .then(movie => {
+      return response.json(movie);
+    })
+    .catch(error => {
+      next('Error updating movie: ' + error);
     });
 };
 
